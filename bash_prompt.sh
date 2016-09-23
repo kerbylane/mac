@@ -1,3 +1,7 @@
+git_branch() {
+    echo $(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ \1/')
+}
+
 bash_prompt() {
 
     # color constants
@@ -31,7 +35,7 @@ bash_prompt() {
     local BGC="\[\033[46m\]"
     local BGW="\[\033[47m\]"
     
-    if [[ $(hostname -s) = Rajah ]]; then
+    if [[ $(hostname -s) = Robs-MacBook ]]; then
         local TITLEBAR='\[\033]0;LAPTOP:${PWD}\007\]'
         local PROMPT_COLOR=${EMC}
     else
@@ -55,12 +59,12 @@ bash_prompt() {
     
     local UC=$W         # user's color
     [ $UID -eq "0" ] && UC=$R   # root's color
-    
+
     # PS1="$TITLEBAR${EMC}$(date +"%Y/%m/%d %H:%M:%S") | \${PWD}${EMK}${UC} ${NONE}\n> "
     
     # The color is set by that bit after $TITLEBAR, ${EMK}.  That goes all the way until ${NONE}
     # PS1="$TITLEBAR${PROMPT_COLOR}$(date +"%Y/%m/%d %H:%M:%S") | \${PWD}${NONE}\n> "
-    PS1="$TITLEBAR${PROMPT_COLOR}\d \t | \${PWD}${NONE}\n> "
+    PS1="$TITLEBAR${PROMPT_COLOR}\d \t | \${PWD} ${Y} \$(git_branch) ${NONE}\n> "
     # without colors: PS1="[\u@\h \${NEW_PWD}]\\$ "
     # extra backslash in front of \$ to make bash colorize the prompt
 }
