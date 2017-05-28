@@ -1,5 +1,5 @@
 git_branch() {
-    echo $(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ \1/')
+    echo $(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ | \1/')
 }
 
 bash_prompt() {
@@ -64,7 +64,7 @@ bash_prompt() {
     
     # The color is set by that bit after $TITLEBAR, ${EMK}.  That goes all the way until ${NONE}
     # PS1="$TITLEBAR${PROMPT_COLOR}$(date +"%Y/%m/%d %H:%M:%S") | \${PWD}${NONE}\n> "
-    PS1="$TITLEBAR${PROMPT_COLOR}\d \t | \${PWD} ${Y} \$(git_branch) ${NONE}\n> "
+    PS1="$TITLEBAR${PROMPT_COLOR}\d \t | \${PWD} ${Y}\$(git_branch) ${NONE}\n> "
     # without colors: PS1="[\u@\h \${NEW_PWD}]\\$ "
     # extra backslash in front of \$ to make bash colorize the prompt
 }
