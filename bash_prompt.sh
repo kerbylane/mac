@@ -116,7 +116,7 @@ function time_range_presentation() {
     local END_PART=${time_end:0:8}
     if [ "$START_PART" = "$END_PART" ]; then
         # echo "same through hours"
-        printf "${time_start} - ${time_end:9}|${dur_string}"
+        printf "${time_start} - ${time_end:9} | ${dur_string}"
         return 0
     fi
 
@@ -125,12 +125,12 @@ function time_range_presentation() {
     local END_PART=${time_end:0:5}
     if [ "$START_PART" = "$END_PART" ]; then
         # echo "same through date"
-        printf "${time_start} - ${time_end:6}|${dur_string}"
+        printf "${time_start} - ${time_end:6} | ${dur_string}"
         return 0
     fi
 
     # not enough similarities that we want to shorten anything
-    printf "${time_start} - ${time_end}|${dur_string}"
+    printf "${time_start} - ${time_end} | ${dur_string}"
 }
 
 # Commands to be run after the next user command and before displaying the prompt.
