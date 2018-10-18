@@ -5,6 +5,13 @@
 # window title with a particular tag for the host.  Otherwise window titles
 # will be set with the actual host name.
 
+# The general flow is that after the user hits enter the function before_commands()
+# is invoked.  That records the starting time of the command.  When the command
+# ends the function post_commands is invoked.  That records the duration of the
+# command.  When the prompt is displayed by PS1 the function
+# time_range_presentation is run.  That determines the end time and generates
+# the desired time data presentation.  See notes on that function for details.
+
 # color constants (https://en.wikipedia.org/wiki/ANSI_escape_code)
 # regular colors
 BLACK="\[\033[0;30m\]"
@@ -60,12 +67,6 @@ function now() {
     gdate +"$DATE_FORMAT"
 }
 
-# Commands to be run before executing commands.
-function before_commands {
-    timer=${timer:-$SECONDS} # this syntax provides a default of $SECONDS if timer isn't set
-    time_start=$(now)
-}
-
 # Returns a string representation of a number of seconds. If the number of seconds
 # is less than 1 hour the format is MM:SS.  If it is more than an hour the format
 # is H:MM:SS.
@@ -83,6 +84,21 @@ function duration_to_string() {
     printf "${output}%02d:%02d" "${min}" "${sec}"
 }
 
+# Commands to be run before executing commands.
+function before_commands {
+    timer=${timer:-$SECONDS} # this syntax provides a default of $SECONDS if timer isn't set
+    time_start=$(now)
+}
+
+# Commands to be run after the next user command and before displaying the prompt.
+function post_commands {
+    # it seems that these must be very limited in order to avoid causing the trap
+    # we use to call before_commands to be invoked.  But that may be due to how
+    # I was testing it.
+    timer_duration=$(( $SECONDS - $timer ))
+    unset timer
+}
+
 # produces the string we want to show the time of the last command.
 function time_range_presentation() {
     # examples
@@ -95,58 +111,43 @@ function time_range_presentation() {
     #  otherwise print both fully
     #   10/16 21:48:42 - 10/17 01:57:02 ->  10/16 21:48:42 - 10/17 01:57:02 - dur
 
-    [[ -z $timer_duration ]] && return 0
+    [[ -z ${timer_duration} ]] && return 0
 
-    if (( $timer_duration == 0 )); then
-        printf "${time_start}"
-        return 0
-    fi
+    (( $timer_duration == 0 )) && printf "${time_start}" && return 0
 
-    # echo "timer_duration: $timer_duration"
-    local dur_string=$(duration_to_string $timer_duration)
+    local dur_string=$(duration_to_string ${timer_duration})
 
     local start_seconds=$(time_to_seconds "$time_start")
-    # echo "got start_seconds: $start_seconds"
     local end_seconds=$(( $start_seconds + $timer_duration ))
-    # echo "got end_seconds: $end_seconds"
-    local time_end=$(seconds_to_time $end_seconds)
-    # echo "got time_end: $time_end"
-    # everything is the same from month through hours
+    local time_end=$(seconds_to_time ${end_seconds})
+
     local START_PART=${time_start:0:8}
     local END_PART=${time_end:0:8}
+    local END_STRING=
     if [ "$START_PART" = "$END_PART" ]; then
-        # echo "same through hours"
-        printf "${time_start} - ${time_end:9} | ${dur_string}"
-        return 0
+        # It's the same hour, copy the end MM:SS
+        END_STRING="${time_end:9}"
+    else
+        START_PART=${time_start:0:5}
+        END_PART=${time_end:0:5}
+        if [ "$START_PART" = "$END_PART" ]; then
+            # It's the same date, copy the end time
+            END_STRING="${time_end:6}"
+        fi
     fi
 
-    # month and date are the same
-    local START_PART=${time_start:0:5}
-    local END_PART=${time_end:0:5}
-    if [ "$START_PART" = "$END_PART" ]; then
-        # echo "same through date"
-        printf "${time_start} - ${time_end:6} | ${dur_string}"
-        return 0
-    fi
+    # If we haven't set END_STRING by now there are not enough similarities
+    # that we want to shorten anything.
+    [[ -z ${END_STRING} ]] && END_STRING="${time_end}"
 
-    # not enough similarities that we want to shorten anything
-    printf "${time_start} - ${time_end} | ${dur_string}"
-}
-
-# Commands to be run after the next user command and before displaying the prompt.
-function post_commands {
-    # it seems that these must be very limited in order to avoid causing the trap
-    # we use to call before_commands to be invoked.  But that may be due to how
-    # I was testing it.
-    timer_duration=$(( $SECONDS - $timer ))
-    unset timer
+    printf "${time_start} - ${END_STRING} | ${dur_string}"
 }
 
 # Set MY_HOST_NAME in ~/.bash_profile to the name you want in your window title bar
 # Otherwise the actual host name will be used.
-if [[ -z $MY_HOST_NAME ]]; then
+if [[ -z ${MY_HOST_NAME} ]]; then
     PROMPT_COLOR=${GREEN_BOLD}
-    case $TERM in
+    case ${TERM} in
         xterm*|rxvt*)
             TITLEBAR='\[\033]0;\h:${PWD}\007\]'
             ;;
@@ -170,10 +171,10 @@ UC=$WHITE
 trap 'before_commands' DEBUG
 
 # PROMPT_COMMAND is always eval-ed just after the last command finishes and
-# before printing out the next prompt
+# before printing out the next prompt.
 if [[ -z $PROMPT_COMMAND ]]; then
     PROMPT_COMMAND="post_commands"
-else
+elif [ $PROMPT_COMMAND != "post_commands" ]; then
     PROMPT_COMMAND="$PROMPT_COMMAND; post_commands"
 fi
 
