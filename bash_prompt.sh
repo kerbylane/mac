@@ -14,36 +14,36 @@
 
 # color constants (https://en.wikipedia.org/wiki/ANSI_escape_code)
 # regular colors
-BLACK="\[\033[0;30m\]"
-RED="\[\033[0;31m\]"
-GREEN="\[\033[0;32m\]"
-YELLOW="\[\033[0;33m\]"
-BLUE="\[\033[0;34m\]"
+BLACK="\033[0;30m"
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+YELLOW="\033[0;33m"
+BLUE="\033[0;34m"
 MAGENTA="\033[0;35m"
-CYAN="\[\033[0;36m\]"
-WHITE="\[\033[0;37m\]"
+CYAN="\033[0;36m"
+WHITE="\033[0;37m"
 
 # bold colors
-BLACK_BOLD="\[\033[1;30m\]"
-RED_BOLD="\[\033[1;31m\]"
-GREEN_BOLD="\[\033[1;32m\]"
-YELLOW_BOLD="\[\033[1;33m\]"
-BLUE_BOLD="\[\033[1;34m\]"
-MAGENTA_BOLD="\[\033[1;35m\]"
-CYAN_BOLD="\[\033[1;36m\]"
-WHITE_BOLD="\[\033[1;37m\]"
+BLACK_BOLD="\033[1;30m"
+RED_BOLD="\033[1;31m"
+GREEN_BOLD="\033[1;32m"
+YELLOW_BOLD="\033[1;33m"
+BLUE_BOLD="\033[1;34m"
+MAGENTA_BOLD="\033[1;35m"
+CYAN_BOLD="\033[1;36m"
+WHITE_BOLD="\033[1;37m"
 
-NONE="\[\033[0m\]" # Resets to default colors
+NONE="\033[0m" # Resets to default colors
 
 # background colors
-#BGK="\[\033[40m\]"
-#BGR="\[\033[41m\]"
-#BGG="\[\033[42m\]"
-#BGY="\[\033[43m\]"
-#BGB="\[\033[44m\]"
-#BGM="\[\033[45m\]"
-#BGC="\[\033[46m\]"
-#BGW="\[\033[47m\]"
+#BGK="\033[40m"
+#BGR="\033[41m"
+#BGG="\033[42m"
+#BGY="\033[43m"
+#BGB="\033[44m"
+#BGM="\033[45m"
+#BGC="\033[46m"
+#BGW="\033[47m"
 
 DATE_FORMAT="%m/%d %H:%M:%S"
 
@@ -102,7 +102,7 @@ function post_commands {
 # produces the string we want to show the time of the last command.
 function time_range_presentation() {
     # examples
-    #  If dur < 1 sec just print the time
+    #  If dur == 0 sec just print the time
     #                                                              10/16 21:48:42
     #  if hours are the same only print distinct MM:SS
     #   10/16 21:48:42 - 10/16 21:57:02 ->           10/16 21:48:42 - 57:02 - dur
@@ -124,13 +124,13 @@ function time_range_presentation() {
     local START_PART=${time_start:0:8}
     local END_PART=${time_end:0:8}
     local END_STRING=
-    if [ "$START_PART" = "$END_PART" ]; then
+    if [ "${START_PART}" = "${END_PART}" ]; then
         # It's the same hour, copy the end MM:SS
         END_STRING="${time_end:9}"
     else
         START_PART=${time_start:0:5}
         END_PART=${time_end:0:5}
-        if [ "$START_PART" = "$END_PART" ]; then
+        if [ "${START_PART}" = "${END_PART}" ]; then
             # It's the same date, copy the end time
             END_STRING="${time_end:6}"
         fi
@@ -143,13 +143,30 @@ function time_range_presentation() {
     printf "${time_start} - ${END_STRING} | ${dur_string}"
 }
 
+function full_prompt() {
+    # Roughly we wat the output to look like this:
+    # "${TITLEBAR}${PROMPT_COLOR}\w ${YELLOW}\$(git_branch)\t${MAGENTA}\$(time_range_presentation)${NONE}\n> "
+    local time_range="$(time_range_presentation)"
+    local branch=$(git_branch)
+    local dir=${PWD}
+    if [[ -z ${branch} ]] || (( ${#branch} == 0 )); then
+        local right_tab_width=$(( ${COLUMNS} - ${#dir} ))
+        printf "${TITLEBAR}${PROMPT_COLOR}%s${MAGENTA}%*s${NONE}\n> " \
+            ${dir} ${right_tab_width} "${time_range}"
+    else
+        local right_tab_width=$(( ${COLUMNS} - ${#dir} - ${#branch} - 1 ))
+        printf "${TITLEBAR}${PROMPT_COLOR}%s ${YELLOW}%s${MAGENTA}%*s${NONE}\n> " \
+            ${dir} "${branch}" ${right_tab_width} "${time_range}"
+    fi
+}
+
 # Set MY_HOST_NAME in ~/.bash_profile to the name you want in your window title bar
 # Otherwise the actual host name will be used.
 if [[ -z ${MY_HOST_NAME} ]]; then
     PROMPT_COLOR=${GREEN_BOLD}
     case ${TERM} in
         xterm*|rxvt*)
-            TITLEBAR='\[\033]0;\h:${PWD}\007\]'
+            TITLEBAR='\033]0;\h:${PWD}\007'
             ;;
         *)
             # This is what screen uses.
@@ -159,13 +176,13 @@ if [[ -z ${MY_HOST_NAME} ]]; then
             ;;
     esac
 else
-    TITLEBAR='\[\033]0;${MY_HOST_NAME}:${PWD}\007\]'
+    TITLEBAR="\033]0;${MY_HOST_NAME}:${PWD}\007"
     PROMPT_COLOR=${CYAN_BOLD}
 fi
 
 # user's color
-UC=$WHITE
-[ $UID -eq "0" ] && UC=$RED   # root's color
+UC=${WHITE}
+[ $UID -eq "0" ] && UC=${RED}   # root's color
 
 # This trap command causes before_commands to be executed before any command is run
 trap 'before_commands' DEBUG
@@ -179,5 +196,6 @@ elif [ $PROMPT_COMMAND != "post_commands" ]; then
 fi
 
 # The color is set by that bit after $TITLEBAR, ${EMK}.  That goes all the way until ${NONE}
-PS1="${TITLEBAR}${MAGENTA}\$(time_range_presentation) ${PROMPT_COLOR}\w ${YELLOW}\$(git_branch)${NONE}\n> "
+# PS1="${TITLEBAR}${MAGENTA}\$(time_range_presentation) ${PROMPT_COLOR}\w ${YELLOW}\$(git_branch)${NONE}\n> "
+PS1="\$(full_prompt)"
 # extra backslash in front of \$() to force execution
