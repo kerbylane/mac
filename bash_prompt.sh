@@ -54,17 +54,17 @@ git_branch() {
 
 # Returns a string representation of a time given in seconds.
 function seconds_to_time() {
-    gdate --date="@${1}" +"$DATE_FORMAT"
+    date --date="@${1}" +"$DATE_FORMAT"
 }
 
 # Returns the number of seconds from a given time (date).
 function time_to_seconds() {
-    gdate --date="${1}" +"%s"
+    date --date="${1}" +"%s"
 }
 
 # Return a string representation of the current time.
 function now() {
-    gdate +"$DATE_FORMAT"
+    date +"$DATE_FORMAT"
 }
 
 # Returns a string representation of a number of seconds. If the number of seconds
@@ -124,7 +124,7 @@ function time_range_presentation() {
     local START_PART=${time_start:0:8}
     local END_PART=${time_end:0:8}
     local END_STRING=
-    if [ "${START_PART}" = "${END_PART}" ]; then
+    if [[ "${START_PART}" = "${END_PART}" ]]; then
         # It's the same hour, copy the end MM:SS
         END_STRING="${time_end:9}"
     else
@@ -148,7 +148,7 @@ function full_prompt() {
     # "${TITLEBAR}${PROMPT_COLOR}\w ${YELLOW}\$(git_branch)\t${MAGENTA}\$(time_range_presentation)${NONE}\n> "
     local time_range="$(time_range_presentation)"
     local branch=$(git_branch)
-    local dir=${PWD}
+    local dir="${PWD/#$HOME/~}"
     if [[ -z ${branch} ]] || (( ${#branch} == 0 )); then
         local right_tab_width=$(( ${COLUMNS} - ${#dir} ))
         printf "${TITLEBAR}${PROMPT_COLOR}%s${MAGENTA}%*s${NONE}\n> " \
@@ -191,7 +191,7 @@ trap 'before_commands' DEBUG
 # before printing out the next prompt.
 if [[ -z $PROMPT_COMMAND ]]; then
     PROMPT_COMMAND="post_commands"
-elif [ $PROMPT_COMMAND != "post_commands" ]; then
+elif [[ $PROMPT_COMMAND != "post_commands" ]]; then
     PROMPT_COMMAND="$PROMPT_COMMAND; post_commands"
 fi
 
