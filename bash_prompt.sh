@@ -152,11 +152,11 @@ function full_prompt() {
     if [[ -z ${branch} ]] || (( ${#branch} == 0 )); then
         local right_tab_width=$(( ${COLUMNS} - ${#dir} ))
         printf "${TITLEBAR}${PROMPT_COLOR}%s${MAGENTA}%*s${NONE}\n> " \
-            ${dir} ${right_tab_width} "${time_range}"
+            "${dir}" ${right_tab_width} "${time_range}"
     else
         local right_tab_width=$(( ${COLUMNS} - ${#dir} - ${#branch} - 1 ))
         printf "${TITLEBAR}${PROMPT_COLOR}%s ${YELLOW}%s${MAGENTA}%*s${NONE}\n> " \
-            ${dir} "${branch}" ${right_tab_width} "${time_range}"
+            "${dir}" "${branch}" ${right_tab_width} "${time_range}"
     fi
 }
 
