@@ -7,9 +7,9 @@
 
 # The general flow is that after the user hits enter the function before_commands()
 # is invoked.  That records the starting time of the command.  When the command
-# ends the function post_commands is invoked.  That records the duration of the
+# ends the function post_commands() is invoked.  That records the duration of the
 # command.  When the prompt is displayed by PS1 the function
-# time_range_presentation is run.  That determines the end time and generates
+# time_range_presentation() is run.  That determines the end time and generates
 # the desired time data presentation.  See notes on that function for details.
 
 # color constants (https://en.wikipedia.org/wiki/ANSI_escape_code)
@@ -18,6 +18,7 @@ BLACK="\033[0;30m"
 RED="\033[0;31m"
 GREEN="\033[0;32m"
 YELLOW="\033[0;33m"
+LIGHT_YELLOW="\033[0;93m"
 BLUE="\033[0;34m"
 MAGENTA="\033[0;35m"
 CYAN="\033[0;36m"
@@ -88,6 +89,7 @@ function duration_to_string() {
 function before_commands {
     timer=${timer:-$SECONDS} # this syntax provides a default of $SECONDS if timer isn't set
     time_start=$(now)
+    printf "${NONE}" # this causes the output of the command to be presented without a color
 }
 
 # Commands to be run after the next user command and before displaying the prompt.
@@ -144,18 +146,18 @@ function time_range_presentation() {
 }
 
 function full_prompt() {
-    # Roughly we wat the output to look like this:
+    # Roughly we want the output to look like this:
     # "${TITLEBAR}${PROMPT_COLOR}\w ${YELLOW}\$(git_branch)\t${MAGENTA}\$(time_range_presentation)${NONE}\n> "
     local time_range="$(time_range_presentation)"
     local branch=$(git_branch)
     local dir="${PWD/#$HOME/~}"
     if [[ -z ${branch} ]] || (( ${#branch} == 0 )); then
         local right_tab_width=$(( ${COLUMNS} - ${#dir} ))
-        printf "${TITLEBAR}${PROMPT_COLOR}%s${MAGENTA}%*s${NONE}\n> " \
+        printf "${TITLEBAR}${PROMPT_COLOR}%s${MAGENTA}%*s${NONE}\n> ${YELLOW}" \
             "${dir}" ${right_tab_width} "${time_range}"
     else
         local right_tab_width=$(( ${COLUMNS} - ${#dir} - ${#branch} - 1 ))
-        printf "${TITLEBAR}${PROMPT_COLOR}%s ${YELLOW}%s${MAGENTA}%*s${NONE}\n> " \
+        printf "${TITLEBAR}${PROMPT_COLOR}%s ${GREEN}%s${MAGENTA}%*s${NONE}\n> ${YELLOW}" \
             "${dir}" "${branch}" ${right_tab_width} "${time_range}"
     fi
 }
@@ -195,7 +197,5 @@ elif [[ $PROMPT_COMMAND != "post_commands" ]]; then
     PROMPT_COMMAND="$PROMPT_COMMAND; post_commands"
 fi
 
-# The color is set by that bit after $TITLEBAR, ${EMK}.  That goes all the way until ${NONE}
-# PS1="${TITLEBAR}${MAGENTA}\$(time_range_presentation) ${PROMPT_COLOR}\w ${YELLOW}\$(git_branch)${NONE}\n> "
 PS1="\$(full_prompt)"
 # extra backslash in front of \$() to force execution
