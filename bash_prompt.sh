@@ -145,9 +145,32 @@ function time_range_presentation() {
     printf "${time_start} - ${END_STRING} | ${dur_string}"
 }
 
+# Set MY_HOST_NAME in ~/.bash_profile to the name you want in your window title bar
+# Otherwise the actual host name will be used.
+function title_bar() {
+    if [[ -z ${MY_HOST_NAME} ]]; then
+        PROMPT_COLOR=${GREEN_BOLD}
+        case ${TERM} in
+            xterm*|rxvt*)
+                TITLEBAR="\033]0;\h:${PWD/#$HOME/~}\007"
+                ;;
+            *)
+                # This is what screen uses.
+                # You can change this by putting the following into ~/.screenrc
+                # term xterm
+                TITLEBAR=""
+                ;;
+        esac
+    else
+        TITLEBAR="\033]0;${MY_HOST_NAME}:${PWD}\007"
+        PROMPT_COLOR=${CYAN_BOLD}
+    fi
+}
+
 function full_prompt() {
     # Roughly we want the output to look like this:
     # "${TITLEBAR}${PROMPT_COLOR}\w ${YELLOW}\$(git_branch)\t${MAGENTA}\$(time_range_presentation)${NONE}\n> "
+    title_bar # update variables for the title bar
     local time_range="$(time_range_presentation)"
     local branch=$(git_branch)
     local dir="${PWD/#$HOME/~}"
@@ -161,26 +184,6 @@ function full_prompt() {
             "${dir}" "${branch}" ${right_tab_width} "${time_range}"
     fi
 }
-
-# Set MY_HOST_NAME in ~/.bash_profile to the name you want in your window title bar
-# Otherwise the actual host name will be used.
-if [[ -z ${MY_HOST_NAME} ]]; then
-    PROMPT_COLOR=${GREEN_BOLD}
-    case ${TERM} in
-        xterm*|rxvt*)
-            TITLEBAR='\033]0;\h:${PWD}\007'
-            ;;
-        *)
-            # This is what screen uses.
-            # You can change this by putting the following into ~/.screenrc
-            # term xterm
-            TITLEBAR=""
-            ;;
-    esac
-else
-    TITLEBAR="\033]0;${MY_HOST_NAME}:${PWD}\007"
-    PROMPT_COLOR=${CYAN_BOLD}
-fi
 
 # user's color
 UC=${WHITE}
