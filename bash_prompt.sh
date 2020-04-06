@@ -74,14 +74,14 @@ function now() {
 function duration_to_string() {
     local output=""
     local dur=$1
-    if (( $dur > 3600 )); then
-        hours=$(( $dur / 3600 ))
+    if (( dur > 3600 )); then
+        (( hours = dur / 3600 ))
         output="${hours}:"
-        dur=$(( $dur % 3600 ))
+        (( dur = dur % 3600 ))
     fi
 
-    min=$(( $dur / 60 ))
-    sec=$(( $dur % 60 ))
+    (( min = dur / 60 ))
+    (( sec = dur % 60 ))
     printf "${output}%02d:%02d" "${min}" "${sec}"
 }
 
@@ -97,7 +97,7 @@ function post_commands {
     # it seems that these must be very limited in order to avoid causing the trap
     # we use to call before_commands to be invoked.  But that may be due to how
     # I was testing it.
-    timer_duration=$(( $SECONDS - $timer ))
+    (( timer_duration = SECONDS - timer ))
     unset timer
 }
 
@@ -115,12 +115,12 @@ function time_range_presentation() {
 
     [[ -z ${timer_duration} ]] && return 0
 
-    (( $timer_duration == 0 )) && printf "${time_start}" && return 0
+    (( timer_duration == 0 )) && printf "${time_start}" && return 0
 
     local dur_string=$(duration_to_string ${timer_duration})
 
     local start_seconds=$(time_to_seconds "$time_start")
-    local end_seconds=$(( $start_seconds + $timer_duration ))
+    local end_seconds=$(( start_seconds + timer_duration ))
     local time_end=$(seconds_to_time ${end_seconds})
 
     local START_PART=${time_start:0:8}
@@ -176,17 +176,17 @@ function full_prompt() {
     local dir="${PWD/#$HOME/~}"
     if [[ -z ${branch} ]] || (( ${#branch} == 0 )); then
         local right_tab_width=$(( ${COLUMNS} - ${#dir} ))
-        printf "${TITLEBAR}${PROMPT_COLOR}%s${MAGENTA}%*s${NONE}\n> ${YELLOW}" \
+        printf "${TITLEBAR}${PROMPT_COLOR}%s${MAGENTA}%*s${UC}\n> " \
             "${dir}" ${right_tab_width} "${time_range}"
     else
         local right_tab_width=$(( ${COLUMNS} - ${#dir} - ${#branch} - 1 ))
-        printf "${TITLEBAR}${PROMPT_COLOR}%s ${GREEN}%s${MAGENTA}%*s${NONE}\n> ${YELLOW}" \
+        printf "${TITLEBAR}${PROMPT_COLOR}%s ${GREEN}%s${MAGENTA}%*s${UC}\n> " \
             "${dir}" "${branch}" ${right_tab_width} "${time_range}"
     fi
 }
 
 # user's color
-UC=${WHITE}
+UC=${YELLOW}
 [ $UID -eq "0" ] && UC=${RED}   # root's color
 
 # This trap command causes before_commands to be executed before any command is run
