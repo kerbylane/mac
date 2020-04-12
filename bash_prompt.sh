@@ -47,6 +47,7 @@ NONE="\033[0m" # Resets to default colors
 #BGW="\033[47m"
 
 DATE_FORMAT="%m/%d %H:%M:%S"
+FIRST_COMMAND=true
 
 # grab the git branch name of the current directory
 git_branch() {
@@ -87,9 +88,14 @@ function duration_to_string() {
 
 # Commands to be run before executing commands.
 function before_commands {
+    if [[ $FIRST_COMMAND = true ]]; then
+        FIRST_COMMAND=false
+    else
+        return
+    fi
+    
     timer=${timer:-$SECONDS} # this syntax provides a default of $SECONDS if timer isn't set
     time_start=$(now)
-    printf "${NONE}" # this causes the output of the command to be presented without a color
 }
 
 # Commands to be run after the next user command and before displaying the prompt.
@@ -99,6 +105,7 @@ function post_commands {
     # I was testing it.
     (( timer_duration = SECONDS - timer ))
     unset timer
+    FIRST_COMMAND=true
 }
 
 # produces the string we want to show the time of the last command.
@@ -200,5 +207,5 @@ elif [[ $PROMPT_COMMAND != "post_commands" ]]; then
     PROMPT_COMMAND="$PROMPT_COMMAND; post_commands"
 fi
 
-PS1="\$(full_prompt)"
 # extra backslash in front of \$() to force execution
+PS1="\$(full_prompt)"
