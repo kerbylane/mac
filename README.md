@@ -1,10 +1,10 @@
 System set up instructions
 
 - Install XCode command line tools:
-```
+```bash
 xcode-select --install
 ```
-- Install MacPorts
+- Install MacPorts (from https://www.macports.org/install.php)
 - Install MacPorts coreutils
 ```bash
 sudo port install coreutils
@@ -15,17 +15,17 @@ mkdir ~/personal
 cd ~/personal
 git clone https://github.com/kerbylane/mac.git
 ```
-- in your home directory create links to the files in the dotFiles directory except for .bash_profile
+- in your home directory create links to the files in the dotFiles directory except for bash_profile
 ```bash
 for file in personal/mac/dotFiles/.*; do 
     name=$(echo $file | cut -d / -f 4)
-    ln -s $file ./$name
+    ln -s $file ./.$name
 done
 ```
 - In ~/.bash_profile add the following:
 ```bash
 export MY_HOST_NAME=LAPTOP # see bash_prompt.sh for information
-source ~/personal/mac/dotfiles/.bash_profile
+source ~/personal/mac/dotfiles/bash_profile
 ```
 - Update your shell to a more recent version:
 ```bash
