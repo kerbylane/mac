@@ -1,0 +1,42 @@
+set -o vi
+
+alias vi='TERM=screen-bce vim'
+
+export LANG=C
+
+# Set the bash prompt
+source ~/personal/mac/bash_prompt.sh
+
+export MYSQL_PS1="\u@\d \R:\m:\s> "
+
+# causes `ls` to color different types of contents (dir, executable, etc.).
+export CLICOLOR=1
+
+# Use Macports' GNU versions in favor of MacOS versions
+export PATH=/opt/local/libexec/gnubin:$PATH
+
+export GPG_TTY=$(tty)
+
+DOT_FILE_PATH=~/personal/mac/dotFiles
+
+source $DOT_FILE_PATH/hadoop_profile
+source $DOT_FILE_PATH/perforce_profile
+
+###############################
+#
+# Python
+#
+###############################
+
+# Setting PATH for Python 3.8
+# The original version is saved in .bash_profile.pysave
+export PATH="/Library/Frameworks/Python.framework/Versions/3.8/bin:${PATH}"
+
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+
+if command -v pyenv 1>/dev/null 2>&1; then
+    eval "$(pyenv init -)"
+fi
+
+export PYENV_VERSION=3.7.3

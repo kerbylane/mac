@@ -1,0 +1,11 @@
+###############################
+#
+# Perforce
+#
+###############################
+
+# export P4PORT=ssl:p4proxy.seattle.soma.salesforce.com:1999
+export P4PORT=ssl:p4proxy.soma.salesforce.com:1999
+export P4USER=robert.reid
+export P4CLIENT=rreid-ltm-blt
+export EDITOR=/usr/bin/vi

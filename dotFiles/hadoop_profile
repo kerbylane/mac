@@ -1,0 +1,36 @@
+###############################
+#
+# Hadoop
+#
+###############################
+
+export HADOOP_HOME=/usr/local/opt/hadoop
+export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+
+# make sure data directory exists
+
+export ZOOKEEPER_HOME=/usr/local/opt/zookeeper
+export PATH=$PATH:$ZOOKEEPER_HOME/bin
+
+alias hstart="zkServer.sh start ; start-dfs.sh ; start-yarn.sh ; mr-jobhistory-daemon.sh start historyserver"
+alias hstop="stop-yarn.sh ; stop-dfs.sh ; mr-jobhistory-daemon.sh stop historyserver ; zkServer.sh stop"
+
+###############################
+#
+# Spark
+#
+###############################
+
+export SPARK_PATH=/usr/local/opt/spark
+export SPARK_HOME=$SPARK_PATH
+export PYSPARK_DRIVER_PYTHON="jupyter" 
+export PYSPARK_DRIVER_PYTHON_OPTS="notebook" 
+export PATH=$PATH:$SPARK_HOME:$SPARK_HOME/bin:$SPARK_HOME/sbin
+
+# this helps spark drivers get bound to the right port
+export SPARK_LOCAL_IP=127.0.0.1
+
+# This is required for the Spark w/o Hadoop distribution
+
+export SPARK_DIST_CLASSPATH=$($HADOOP_HOME/bin/hadoop classpath)
