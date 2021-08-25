@@ -7,5 +7,8 @@
 # export P4PORT=ssl:p4proxy.seattle.soma.salesforce.com:1999
 export P4PORT=ssl:p4proxy.soma.salesforce.com:1999
 export P4USER=robert.reid
-export P4CLIENT=rreid-ltm-blt
+export P4CLIENT=rreid-ltm3
 export EDITOR=/usr/bin/vi
+
+launchctl setenv P4PORT $P4PORT
+launchctl setenv P4CLIENT $P4CLIENT
