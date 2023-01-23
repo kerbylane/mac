@@ -1,0 +1,6 @@
+javascript: (() => {
+    let sel = window.getSelection().toString();
+    let zd = new Date(0);
+    zd.setSeconds(Number(sel));
+    alert("UNIX epoch " + sel + " is: " + zd.toISOString());
+})();
