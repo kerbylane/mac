@@ -93,7 +93,7 @@ function before_commands {
     else
         return
     fi
-    
+    printf '\033[0m' # This turns colors off before the commands runs
     timer=${timer:-$SECONDS} # this syntax provides a default of $SECONDS if timer isn't set
     time_start=$(now)
 }
