@@ -9,7 +9,7 @@ alias vi='TERM=screen-bce vim'
 export LANG=C
 
 # Set the prompt
-source ~/personal/mac/zsh_prompt.sh
+source ~/dev/mac/zsh_prompt.sh
 
 export MYSQL_PS1="\u@\d \R:\m:\s> "
 
@@ -20,11 +20,6 @@ export CLICOLOR=1
 export PATH=/opt/local/libexec/gnubin:$PATH
 
 export GPG_TTY=$(tty)
-
-DOT_FILE_PATH=~/personal/mac/dotFiles
-
-source $DOT_FILE_PATH/hadoop_profile
-source $DOT_FILE_PATH/perforce_profile
 
 ###############################
 #
@@ -43,4 +38,10 @@ if command -v pyenv 1>/dev/null 2>&1; then
     eval "$(pyenv init -)"
 fi
 
-export PYENV_VERSION=3.7.3
+# standardize a place where local configuration settings can be stored.
+source ~/local.conf
+
+if [[ -d /opt/gradle/bin ]]; then
+	export PATH=$PATH:/opt/gradle/bin
+fi
+
