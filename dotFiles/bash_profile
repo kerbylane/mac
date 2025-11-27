@@ -5,7 +5,7 @@ alias vi='TERM=screen-bce vim'
 export LANG=C
 
 # Set the bash prompt
-source ~/personal/mac/bash_prompt.sh
+source ~/dev/mac/bash_prompt.sh
 
 export MYSQL_PS1="\u@\d \R:\m:\s> "
 
@@ -17,10 +17,7 @@ export PATH=/opt/local/libexec/gnubin:$PATH
 
 export GPG_TTY=$(tty)
 
-DOT_FILE_PATH=~/personal/mac/dotFiles
-
-source $DOT_FILE_PATH/hadoop_profile
-source $DOT_FILE_PATH/perforce_profile
+DOT_FILE_PATH=~/dev/mac/dotFiles
 
 ###############################
 #
