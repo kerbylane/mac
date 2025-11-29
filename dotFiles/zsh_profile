@@ -1,6 +1,5 @@
 set -o vi
 setopt interactivecomments
-setopt prompt_subst
 
 alias vi='TERM=screen-bce vim'
 
@@ -28,11 +27,6 @@ if command -v pyenv 1>/dev/null 2>&1; then
     eval "$(pyenv init -)"
 	export PYENV_ROOT="$HOME/.pyenv"
 	export PATH="$PYENV_ROOT/bin:$PATH"
-fi
-
-# standardize a place where local configuration settings can be stored.
-if [[ -f ~/local.conf ]]; then
-	source ~/local.conf
 fi
 
 if [[ -d /opt/gradle/bin ]]; then
