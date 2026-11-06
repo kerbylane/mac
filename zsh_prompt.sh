@@ -12,10 +12,12 @@ LAST_COMMAND_DURATION=0
 COMMAND_START_SECONDS=$EPOCHSECONDS
 COMMAND_ISSUED=false # track whether or not a command was run so we can update time correctly
 
-if [[ -z ${MY_HOST_NAME} ]]; then
-    PROMPT_COLOR="%F{green}"
-else
+if [[ ${MY_HOST_NAME} == "LAPTOP" ]]; then
     PROMPT_COLOR="%F{cyan}%B"
+elif [[ -z ${MY_HOST_NAME} ]]; then
+    PROMPT_COLOR="%F{red}"
+else
+    PROMPT_COLOR="%F{green}"
 fi
 
 # --- 3. UTILITY FUNCTIONS ---
