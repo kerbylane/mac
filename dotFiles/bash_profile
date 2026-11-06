@@ -18,14 +18,3 @@ export PATH=/opt/local/libexec/gnubin:$PATH
 export GPG_TTY=$(tty)
 
 DOT_FILE_PATH=~/dev/mac/dotFiles
-
-
-###############################
-#
-# Python
-#
-###############################
-
-
-
-
